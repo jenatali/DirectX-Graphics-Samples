@@ -49,6 +49,8 @@ protected:
     // Adapter info.
     bool m_useWarpDevice;
 
+	bool m_unattendMode;
+
 private:
     // Root assets path.
     std::wstring m_assetsPath;

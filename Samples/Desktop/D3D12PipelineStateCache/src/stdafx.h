@@ -19,6 +19,8 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers.
 #endif
 
+#define __ID3D12Device8_INTERFACE_DEFINED__
+
 #include <windows.h>
 
 #include <dxgi1_4.h>

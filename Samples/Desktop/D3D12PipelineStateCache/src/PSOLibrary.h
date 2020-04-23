@@ -226,14 +226,20 @@ public:
         UINT frameIndex);
 
     void EndFrame();
-    void ClearPSOCache();
+    void ClearPSOCache(ID3D12Device* device);
     void ToggleUberShader();
     void ToggleDiskLibrary();
+	void ToggleImplicitCaches(ID3D12Device* device);
+	void ToggleClearImplicitCaches();
+	void ToggleSleepToEmulateCompile();
     void SwitchPSOCachingMechanism();
     void DestroyShader(EffectPipelineType type);
 
     bool UberShadersEnabled() { return m_useUberShaders; }
     bool DiskCacheEnabled() { return m_useDiskLibraries; }
+	bool ImplicitCachesEnabled() { return !m_disableImplicitCaches; }
+	bool ClearAlsoClearsImplicitCaches() { return m_clearImplicitCaches; }
+	bool SleepToEmulateCompile() { return m_sleepToEmulateCompile; }
     PSOCachingMechanism GetPSOCachingMechanism() { return m_psoCachingMechanism; }
 
 private:
@@ -269,6 +275,9 @@ private:
     bool m_useUberShaders;
     bool m_useDiskLibraries;
     bool m_pipelineLibrariesSupported;
+	bool m_disableImplicitCaches;
+	bool m_clearImplicitCaches;
+	bool m_sleepToEmulateCompile;
     PSOCachingMechanism m_psoCachingMechanism;
     std::wstring m_cachePath;
 

@@ -11,6 +11,141 @@
 
 #include "stdafx.h"
 #include "PSOLibrary.h"
+    
+MIDL_INTERFACE("9218E6BB-F944-4F7E-A75C-B1B2C7B701F3")
+ID3D12Device8 : public ID3D12Device7
+{
+public:
+	virtual D3D12_RESOURCE_ALLOCATION_INFO STDMETHODCALLTYPE GetResourceAllocationInfo2(
+		UINT visibleMask,
+		UINT numResourceDescs,
+		/* [annotation] */
+		_In_reads_(numResourceDescs)  const D3D12_RESOURCE_DESC1 * pResourceDescs,
+		/* [annotation] */
+		_Out_writes_opt_(numResourceDescs)  D3D12_RESOURCE_ALLOCATION_INFO1 * pResourceAllocationInfo1) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE CreateCommittedResource2(
+		/* [annotation] */
+		_In_  const D3D12_HEAP_PROPERTIES* pHeapProperties,
+		D3D12_HEAP_FLAGS HeapFlags,
+		/* [annotation] */
+		_In_  const D3D12_RESOURCE_DESC1* pDesc,
+		D3D12_RESOURCE_STATES InitialResourceState,
+		/* [annotation] */
+		_In_opt_  const D3D12_CLEAR_VALUE* pOptimizedClearValue,
+		/* [annotation] */
+		_In_opt_  ID3D12ProtectedResourceSession* pProtectedSession,
+		/* [in] */ REFIID riidResource,
+		/* [annotation][iid_is][out] */
+		_COM_Outptr_opt_  void** ppvResource) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE CreatePlacedResource1(
+		/* [annotation] */
+		_In_  ID3D12Heap* pHeap,
+		UINT64 HeapOffset,
+		/* [annotation] */
+		_In_  const D3D12_RESOURCE_DESC1* pDesc,
+		D3D12_RESOURCE_STATES InitialState,
+		/* [annotation] */
+		_In_opt_  const D3D12_CLEAR_VALUE* pOptimizedClearValue,
+		/* [in] */ REFIID riid,
+		/* [annotation][iid_is][out] */
+		_COM_Outptr_opt_  void** ppvResource) = 0;
+
+	virtual void STDMETHODCALLTYPE CreateSamplerFeedbackUnorderedAccessView(
+		/* [annotation] */
+		_In_opt_  ID3D12Resource* pTargetedResource,
+		/* [annotation] */
+		_In_opt_  ID3D12Resource* pFeedbackResource,
+		/* [annotation] */
+		_In_  D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor) = 0;
+
+	virtual void STDMETHODCALLTYPE GetCopyableFootprints1(
+		/* [annotation] */
+		_In_  const D3D12_RESOURCE_DESC1* pResourceDesc,
+		/* [annotation] */
+		_In_range_(0,D3D12_REQ_SUBRESOURCES)  UINT FirstSubresource,
+		/* [annotation] */
+		_In_range_(0,D3D12_REQ_SUBRESOURCES - FirstSubresource)  UINT NumSubresources,
+		UINT64 BaseOffset,
+		/* [annotation] */
+		_Out_writes_opt_(NumSubresources)  D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts,
+		/* [annotation] */
+		_Out_writes_opt_(NumSubresources)  UINT* pNumRows,
+		/* [annotation] */
+		_Out_writes_opt_(NumSubresources)  UINT64* pRowSizeInBytes,
+		/* [annotation] */
+		_Out_opt_  UINT64* pTotalBytes) = 0;
+
+};
+
+typedef 
+enum D3D12_SHADER_CACHE_MODE
+    {
+        D3D12_SHADER_CACHE_MODE_MEMORY	= 0,
+        D3D12_SHADER_CACHE_MODE_DISK	= ( D3D12_SHADER_CACHE_MODE_MEMORY + 1 ) 
+    } 	D3D12_SHADER_CACHE_MODE;
+
+typedef 
+enum D3D12_SHADER_CACHE_FLAGS
+    {
+        D3D12_SHADER_CACHE_FLAG_NONE	= 0,
+        D3D12_SHADER_CACHE_FLAG_DRIVER_VERSIONED	= 0x1,
+        D3D12_SHADER_CACHE_FLAG_USE_WORKING_DIR	= 0x2
+    } 	D3D12_SHADER_CACHE_FLAGS;
+
+DEFINE_ENUM_FLAG_OPERATORS( D3D12_SHADER_CACHE_FLAGS );
+typedef struct D3D12_SHADER_CACHE_SESSION_DESC
+    {
+    GUID Identifier;
+    D3D12_SHADER_CACHE_MODE Mode;
+    D3D12_SHADER_CACHE_FLAGS Flags;
+    UINT MaximumInMemoryCacheSizeBytes;
+    UINT MaximumInMemoryCacheEntries;
+    UINT MaximumValueFileSizeBytes;
+    UINT64 Version;
+    } 	D3D12_SHADER_CACHE_SESSION_DESC;
+
+typedef 
+enum D3D12_SHADER_CACHE_KIND_FLAGS
+    {
+        D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CACHE_FOR_DRIVER	= 0x1,
+        D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CONVERSIONS	= 0x2,
+        D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_DRIVER_MANAGED	= 0x4,
+        D3D12_SHADER_CACHE_KIND_FLAG_APPLICATION_MANAGED	= 0x8
+    } 	D3D12_SHADER_CACHE_KIND_FLAGS;
+
+DEFINE_ENUM_FLAG_OPERATORS( D3D12_SHADER_CACHE_KIND_FLAGS );
+typedef 
+enum D3D12_SHADER_CACHE_CONTROL_FLAGS
+    {
+        D3D12_SHADER_CACHE_CONTROL_FLAG_DISABLE	= 0x1,
+        D3D12_SHADER_CACHE_CONTROL_FLAG_ENABLE	= 0x2,
+        D3D12_SHADER_CACHE_CONTROL_FLAG_CLEAR	= 0x4
+    } 	D3D12_SHADER_CACHE_CONTROL_FLAGS;
+
+DEFINE_ENUM_FLAG_OPERATORS( D3D12_SHADER_CACHE_CONTROL_FLAGS );
+
+    MIDL_INTERFACE("4c80e962-f032-4f60-bc9e-ebc2cfa1d83c")
+    ID3D12Device9 : public ID3D12Device8
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE CreateShaderCacheSession( 
+            _In_  const D3D12_SHADER_CACHE_SESSION_DESC *pDesc,
+            REFIID riid,
+            _COM_Outptr_opt_  void **ppvSession) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE ShaderCacheControl( 
+            D3D12_SHADER_CACHE_KIND_FLAGS Kinds,
+            D3D12_SHADER_CACHE_CONTROL_FLAGS Control) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE CreateCommandQueue1( 
+            _In_  const D3D12_COMMAND_QUEUE_DESC *pDesc,
+            REFIID CreatorID,
+            REFIID riid,
+            _COM_Outptr_  void **ppCommandQueue) = 0;
+        
+    };
 
 using namespace Microsoft::WRL::Wrappers;
 
@@ -21,6 +156,9 @@ PSOLibrary::PSOLibrary(UINT frameCount, UINT cbvRootSignatureIndex) :
     m_flagsMutex(),
     m_useUberShaders(true),
     m_useDiskLibraries(true),
+	m_disableImplicitCaches(false),
+	m_clearImplicitCaches(false),
+	m_sleepToEmulateCompile(true),
     m_psoCachingMechanism(PSOCachingMechanism::PipelineLibraries),
     m_drawIndex(0),
     m_compiledPSOFlags{},
@@ -183,6 +321,7 @@ void PSOLibrary::CompilePSO(CompilePSOThreadData* pDataPackage)
     ID3D12RootSignature* pRootSignature = pDataPackage->pRootSignature;
     EffectPipelineType type = pDataPackage->type;
     bool useCache = false;
+	bool allowSleep = true;
     bool sleepToEmulateComplexCreatePSO = false;
 
     {
@@ -190,6 +329,7 @@ void PSOLibrary::CompilePSO(CompilePSOThreadData* pDataPackage)
 
         // When using the disk cache compilation should be extremely quick so don't sleep.
         useCache = pLibrary->m_useDiskLibraries;
+		allowSleep = pLibrary->m_sleepToEmulateCompile;
     }
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc = {};
@@ -292,7 +432,7 @@ void PSOLibrary::CompilePSO(CompilePSOThreadData* pDataPackage)
     }
 
     // The effects are very simple and should compile quickly so we'll sleep to emulate something more complex.
-    if (sleepToEmulateComplexCreatePSO && type > BaseUberShader)
+    if (sleepToEmulateComplexCreatePSO && type > BaseUberShader && allowSleep)
     {
         Sleep(500);
     }
@@ -316,7 +456,7 @@ void PSOLibrary::EndFrame()
     m_drawIndex = 0;
 }
 
-void PSOLibrary::ClearPSOCache()
+void PSOLibrary::ClearPSOCache(ID3D12Device* device)
 {
     WaitForThreads();
 
@@ -337,6 +477,16 @@ void PSOLibrary::ClearPSOCache()
     }
 
     m_pipelineLibrary.Destroy(true);
+
+	if (m_clearImplicitCaches)
+	{
+		ComPtr<ID3D12Device9> device9;
+		ThrowIfFailed(device->QueryInterface(device9.ReleaseAndGetAddressOf()));
+		device9->ShaderCacheControl(D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CACHE_FOR_DRIVER |
+									D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CONVERSIONS |
+									D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_DRIVER_MANAGED,
+									D3D12_SHADER_CACHE_CONTROL_FLAG_CLEAR);
+	}
 }
 
 void PSOLibrary::ToggleUberShader()
@@ -353,6 +503,32 @@ void PSOLibrary::ToggleDiskLibrary()
     }
 
     WaitForThreads();
+}
+
+void PSOLibrary::ToggleImplicitCaches(ID3D12Device* device)
+{
+	m_disableImplicitCaches = !m_disableImplicitCaches;
+
+	ComPtr<ID3D12Device9> device9;
+	ThrowIfFailed(device->QueryInterface(device9.ReleaseAndGetAddressOf()));
+	device9->ShaderCacheControl(D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CACHE_FOR_DRIVER |
+								D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_D3D_CONVERSIONS |
+								D3D12_SHADER_CACHE_KIND_FLAG_IMPLICIT_DRIVER_MANAGED,
+								m_disableImplicitCaches ? D3D12_SHADER_CACHE_CONTROL_FLAG_DISABLE : D3D12_SHADER_CACHE_CONTROL_FLAG_ENABLE);
+}
+
+void PSOLibrary::ToggleClearImplicitCaches()
+{
+	m_clearImplicitCaches = !m_clearImplicitCaches;
+}
+
+void PSOLibrary::ToggleSleepToEmulateCompile()
+{
+	{
+		auto lock = Mutex::Lock(m_flagsMutex);
+
+		m_sleepToEmulateCompile = !m_sleepToEmulateCompile;
+	}
 }
 
 void PSOLibrary::SwitchPSOCachingMechanism()

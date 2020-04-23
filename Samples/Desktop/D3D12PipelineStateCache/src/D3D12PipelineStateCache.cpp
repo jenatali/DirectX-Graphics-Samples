@@ -41,6 +41,13 @@ void D3D12PipelineStateCache::OnInit()
 
     LoadPipeline();
     LoadAssets();
+	if (m_unattendMode)
+	{
+		m_psoLibrary.ToggleDiskLibrary();
+		m_psoLibrary.ToggleSleepToEmulateCompile();
+		m_psoLibrary.ToggleClearImplicitCaches();
+		UpdateWindowTextPso();
+	}
 }
 
 // Load the rendering pipeline dependencies.
@@ -409,6 +416,43 @@ void D3D12PipelineStateCache::OnRender()
     m_psoLibrary.EndFrame();
 
     MoveToNextFrame();
+
+	if (m_unattendMode)
+	{
+		static LARGE_INTEGER QPCStart = {}, QPCFreq = {};
+		static UINT phase = 0;
+		if (!QPCStart.QuadPart)
+		{
+			QueryPerformanceCounter(&QPCStart);
+			QueryPerformanceFrequency(&QPCFreq);
+		}
+		LARGE_INTEGER QPCNow;
+		QueryPerformanceCounter(&QPCNow);
+		double timePassed = (double)(QPCNow.QuadPart - QPCStart.QuadPart) / (double)QPCFreq.QuadPart;
+		if (phase == 0 && timePassed > 5.0)
+		{
+			WaitForGpu();
+			m_psoLibrary.ClearPSOCache(m_device.Get());
+			m_psoLibrary.ToggleClearImplicitCaches();
+			m_psoLibrary.Build(m_device.Get(), m_rootSignature.Get());
+			phase = 1;
+			UpdateWindowTextPso();
+		}
+		else if (phase == 1 && timePassed > 10.0)
+		{
+			WaitForGpu();
+			m_psoLibrary.ToggleImplicitCaches(m_device.Get());
+			m_psoLibrary.ClearPSOCache(m_device.Get());
+			m_psoLibrary.Build(m_device.Get(), m_rootSignature.Get());
+			phase = 2;
+			UpdateWindowTextPso();
+		}
+		else if (phase == 2 && timePassed > 15.0)
+		{
+			WaitForGpu();
+			DestroyWindow(Win32Application::GetHwnd());
+		}
+	}
 }
 
 void D3D12PipelineStateCache::OnDestroy()
@@ -433,7 +477,7 @@ void D3D12PipelineStateCache::OnKeyUp(UINT8 key)
     {
     case 'C':
         WaitForGpu();
-        m_psoLibrary.ClearPSOCache();
+        m_psoLibrary.ClearPSOCache(m_device.Get());
         m_psoLibrary.Build(m_device.Get(), m_rootSignature.Get());
         break;
 
@@ -448,6 +492,18 @@ void D3D12PipelineStateCache::OnKeyUp(UINT8 key)
     case 'M':
         m_psoLibrary.SwitchPSOCachingMechanism();
         break;
+
+	case 'S':
+		m_psoLibrary.ToggleSleepToEmulateCompile();
+		break;
+
+	case 'I':
+		m_psoLibrary.ToggleImplicitCaches(m_device.Get());
+		break;
+
+	case 'J':
+		m_psoLibrary.ToggleClearImplicitCaches();
+		break;
 
     case '1':
         ToggleEffect(PostBlit);
@@ -640,6 +696,13 @@ void D3D12PipelineStateCache::UpdateWindowTextPso()
     {
         stringStream <<  L"false]";
     }
+
+	stringStream << L"  [Implicit caches: ";
+	stringStream << (m_psoLibrary.ImplicitCachesEnabled() ? L"enabled]" : L"disabled]");
+	stringStream << L"  [Clear implicit caches: ";
+	stringStream << (m_psoLibrary.ClearAlsoClearsImplicitCaches() ? L"true]" : L"false]");
+	stringStream << L"  [Emulate long compile: ";
+	stringStream << (m_psoLibrary.SleepToEmulateCompile() ? L"true]" : L"false]");
 
     SetCustomWindowText(stringStream.str().c_str());
 }

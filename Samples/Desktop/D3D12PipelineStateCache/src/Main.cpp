@@ -23,6 +23,9 @@ FILE* CreateConsoleAndPrintDemoInformation()
     cout << "\t\t U : Toggle Uber Shader usage (rendering will appear dim when in use)" << endl;
     cout << "\t\t L : Toggle Pipeline State library enable (disk cache)" << endl;
     cout << "\t\t M : Toggle PSO caching mechanism" << endl;
+    cout << "\t\t S : Toggle sleep to emulate compilation" << endl;
+    cout << "\t\t I : Toggle implicit cache support" << endl;
+    cout << "\t\t J : Toggle implicit cache clears" << endl;
     cout << "\t\t C : Clear app PSO's and disk cache" << endl;
     cout << "\t\t 1 : Toggle Blit effect" << endl;
     cout << "\t\t 2 : Toggle Invert effect" << endl;
